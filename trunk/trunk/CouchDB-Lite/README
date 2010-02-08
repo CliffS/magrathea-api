@@ -1,0 +1,243 @@
+NAME
+    CouchDB::Lite - A simple perl module for CouchDB
+
+VERSION
+    Version 0.1.0
+
+SYNOPSYS
+        use CouchDB::Lite qw(:boolean);
+
+        my $couch = new CouchDB::Lite(
+            host     => $host, 
+            db       => $database,
+            user     => 'cliff',
+            password => 'geheim'
+        );
+
+        my @databases = $couch->all_dbs;
+        $couch->db('sofa'); die unless $couch->ok;
+        my $docs = $couch->all_docs({ limit => 20 });
+        my $post = $couch->doc('A-test-post'); die unless $couch->ok;
+        $couch->doc($post);
+        my $view = $couch->view('sofa', 'recent-posts');
+
+    This module is designed to be a lightweight interface to CouchDB.
+    Several other CPAN modules exist with similar functionality but they do
+    not appear to have been kept up to date.
+
+    This smodule currently supports CouchDB version 0.10 and I shall
+    endeavour to keep it current as the CouchDB team issues new releases.
+
+    It makes heavy use of JSON::XS and all JSON to Perl conversions are made
+    with this module. It also relies on REST::Client for access to the
+    CouchDN server.
+
+EXPORTS
+    The module does not export anything by default. JSON boolean values are
+    represebted using CouchDB::Lite::Boolean rather than JSON::XS::Boolean
+    values. Although the code has been shamelessly stolen from
+    JSON::XS::Boolean (thanks Marc), the CouchDB::Lite::Boolean value has
+    the advantage that it stringifies to "true" or "false".
+
+    If you wish to import the values of true, false and bool, you may use
+    the module in either of the following ways:
+
+        use CouchDB::Lite qw(true false bool);
+        use CouchDB::Lite qw(:boolean);
+
+    Internal functions with prototypes.
+
+CONSTRUCTOR
+  new(%options)
+    This is the constructor for the CouchDB::Lite object. It takes an
+    optional hash of options.
+
+    The options are:
+
+    host
+        The host address of the CouchDB server. Defaults to 'localhost'.
+
+    port
+        The port to talk to the CouchDB server on. Defaults to 5984.
+
+    user
+        The username to use for the CouchDB server.
+
+    password
+        The password for the user. Note: Both user and password should be
+        set or neither will be used.
+
+    db  The database to use. This may either be set here or using the
+        $couch->db call later.
+
+DATABASE METHODS
+  all_dbs
+    Returns an array containing the names of all databases found on the
+    server.
+
+  db *or* db($name)
+    If the optional name parameter is passed, this sets the database to be
+    used for further operations.
+
+    Returns a reference to a hash of the database information as provided by
+    the server. If no database name has ever been set then $couch->ok wll be
+    false and the server welcome message will be returned.
+
+    The current database name can be retrieved using:
+
+        my $data = $couch->db;
+        my $database_name = $data->{db_name};
+
+  new_db($name)
+    Creates a new database called $name. Note that $name must be lower case.
+
+    Returns a reference to a hash containing "ok => true" on success and
+    sets $couch->ok.
+
+    On failure, sets $couch->ok to false and returns a hash contining
+    "error" and "reason".
+
+  del_db *or* del_db($name)
+    Deletes the named database or the current database if $name is not
+    passed. If the database deleted is the current one, this removes the
+    current database reference from the object.
+
+    Returns a reference to a hash containing "ok => true" on success and
+    sets $couch->ok.
+
+    On failure, sets $couch->ok to false and returns a hash contining
+    "error" and "reason".
+
+DOCUMENT METHODS
+  all_docs *or* all_docs(%params)
+    Calls the "_all_docs" function of CouchDB. Possible parameters include
+    start_key, end_key, limit and descending.
+
+    On success, returns a hash containing "total_rows" as a number and
+    "rows" and an array reference.
+
+    Croaks if no database has been selected.
+
+  new_doc(\%document) *or* new_doc($id, \%document)
+    This is passed either a document as a hash reference or both an id as a
+    string and a document as a hash reference.
+
+    In the former mode, the document id will be created from a uuid by the
+    server, in the latter it will be added from the id passed.
+
+    This function returns the hash as provided by the server and sets
+    "$couch->ok".
+
+  doc($key) *or* doc(\%document)
+    This is the main document-handling function. If it is called with a key
+    as a string, it will try to find the document with that key. If it is
+    called with a reference to a hash, it will attempt to replace the
+    document into the database.
+
+    When getting a document, it is returned as a hash referebce, if found
+    and "$couch->ok" is set to "true". If not found, a hrsh reference of the
+    error is returned containing "error" and "reason". "$couch->ok" will be
+    false;
+
+    When replacing a document, $"$couch->ok" willl be set to true on success
+    and the returned hash reference will contain the revision and the ID. On
+    failure, $"$couch->ok" will be false and the returned hash reference
+    will contain "error" and "reason".
+
+  delete_doc($key, $revision) *or* delete_doc(\%document)
+    This deletes a document from the database. You may either pass the key
+    and the revision as strings or you may pass the document as a hash
+    reference and the key and revision will be taken from the document.
+
+    Returns a hash reference containg the result from the server.
+
+VIEWS METHODS
+  temp_view($map, $reduce, \%options)
+    This will generate a temporary view. The $map and $reduce parameters
+    should be strings containing the body of the map and reduce Javascript
+    functions respectively. If $reduce is undef, no reduce function will be
+    created.
+
+   Example:
+        my $map = q[ if (doc.foo == 'bar') { emit(null, doc.foo); } ];
+        $couch->temp_view($map);
+
+    will generate the following map function:
+
+        function(doc)
+        {
+            if (doc.foo == 'bar') {
+                emit(null, doc.foo);
+            }
+        }
+
+    The return value will be the result of the temporary view, on success or
+    the error on failure. "$couch->ok" will containe true or false
+    respectively.
+
+  view($designdoc, $view, \%opts)
+    The $designdoc may incluide the "_design/" part of the name but it will
+    be added in if not present. The $view is a string containing the name of
+    the view. Opts is a hash reference of CouchDN standard options.
+
+    For example:
+
+        $couch->db('sofa');
+        my $view = $couch->view('sofa', 'recent-posts');
+        die "View Failed: " . $couch->code unless $couch->ok;
+
+RESULTS METHODS
+  ok
+    "$couch->ok" returns a CouchDB::Boolean value of true or false. "true"
+    means the last call was successful, "false" means an error of some kind
+    occurred.
+
+  code
+    "$couch->code" returns the response code from the the most recent http
+    request.
+
+INTERNAL METHODS
+    These methods should normally not be called from outside of the
+    CouchDB::Lite module.
+
+  get($url)
+    Perform a REST GET.
+
+  put($url, $body)
+    Perform a REST PUT.
+
+  post($url, $body)
+    Perform a REST POST.
+
+  delete($url)
+    Perform a REST DELETE.
+
+  url($path, \%query) *or* url(\@path, \%query)
+    This creates a URL for the REST calls passed either the path as a string
+    or as an array. The query string (if any) should be passed as a hash
+    reference.
+
+AUTHOR
+    Cliff Stanford, "<cliff@may.be>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-couchdb-lite@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CouchDB-Lite>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc CouchDB::Lite
+
+    The main documentation for CouchDB can be found at
+    <http://wiki.apache.org/couchdb/>
+
+COPYRIGHT & LICENCE
+    Copyright 2010 Cliff Stanford, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

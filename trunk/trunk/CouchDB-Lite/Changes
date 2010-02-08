@@ -1,0 +1,16 @@
+Revision history for CouchDB-Lite
+
+The full revision history for this is held on a public-access
+Subversion server at http://svn.may.be/svn/CouchDB/perl/trunk/CouchDB-Lite/
+
+It can be browsed on the web interface or checked out using:
+
+$ svn co http://svn.may.be/svn/CouchDB/perl/trunk/CouchDB-Lite
+
+Versions uploaded to CPAN will have a tag created under
+http://svn.may.be/svn/CouchDB/perl/tags/ with the version number
+uploaded.
+
+0.1.0   Sun Feb  7 01:23:38 CET 2010
+        First version, released on an unsuspecting world.
+

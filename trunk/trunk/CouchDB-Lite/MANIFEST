@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CouchDB/Lite.pm
+lib/CouchDB/Lite/Boolean.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
