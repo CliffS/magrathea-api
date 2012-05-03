@@ -1,0 +1,6 @@
+Revision history for Perl extension Magrathea::API.
+
+0.01  Thu May  3 22:10:01 2012
+	- original version; created by h2xs 1.23 with options
+		-AX Magrathea::API
+
