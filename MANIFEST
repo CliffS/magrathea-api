@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Magrathea-API.t
+lib/Magrathea/API.pm
