@@ -4,3 +4,4 @@ MANIFEST
 README
 t/Magrathea-API.t
 lib/Magrathea/API.pm
+lib/Magrathea/API/Status.pm
