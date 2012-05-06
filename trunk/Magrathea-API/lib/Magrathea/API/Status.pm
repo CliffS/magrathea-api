@@ -46,7 +46,7 @@ sub get_type($)
 	    return 'divert';
 	}
 	default {
-	    croak "Unknown Type in $type";
+	    return 'unallocated';
 	}
     }
 }

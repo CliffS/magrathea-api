@@ -19,7 +19,7 @@ our @CARP_NOT = qw{ Net::Telnet }; # Try::Tiny };
 
 #say Dumper \%Carp::Internal, \%Carp::CarpInternal; exit;
 
-use constant DEBUG => 0;
+use constant DEBUG => 1;
 use enum qw{ false true };
 
 =head1 NAME
@@ -207,6 +207,47 @@ sub allocate
     return undef;   # Failed after 5 attempts.
 }
 
+=head2 allocate10
+
+Passed a prefix, this will allocate and activate a block of 10 numbers.  You do
+not need to add the C<_> characters.  If a block can be found, this routine
+should return an arrayref of ten L<Phone::Number> objects. Under odd
+circumstances, it is possible that fewer than ten numbers will be returned;
+
+If no range is foud is found, this routine will return C<undef>. It will croak
+on any other error from Magrathea.
+
+=cut
+
+sub allocate10
+{
+    my $self = shift;
+    my $range = shift;
+    $range = substr $range . '_' x 11, 0, 11;
+    my $alloc = eval {
+	$self->alten($range);
+    };
+    return undef if catch qr/^No range found for allocation/;
+    $alloc =~ s/\s.*$//;
+    die "Odd allocation of $alloc" unless $alloc =~ /^\d+_$/;
+    my @numbers;
+    foreach (0 .. 9)
+    {
+	(my $number = $alloc) =~ s/_$/$_/;
+	eval {
+	    $self->allo($number);
+	    $self->acti($number);
+	};
+	unless ($@)
+	{
+	    my $object = new Phone::Number($number);
+	    push @numbers, $object;
+	}
+    }
+    return \@numbers;
+}
+
+
 =head2 fax2email
 
 Sets a number as a fax to email.
@@ -356,7 +397,7 @@ The date this number expires in the form C<YYYY-MM-DD>.
 
 =item C<< $status->type >>
 
-One of sip, iax2, fax2email, voice2email, divert.
+One of sip, iax2, fax2email, voice2email, divert or unallocated.
 
 =item C<< $status->target >>
 
