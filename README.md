@@ -1,13 +1,13 @@
-# NAME
+## NAME
 
 Magrathea::API - Easier access to the Magrathea NTSAPI
 
-# SYNOPSIS
+## SYNOPSIS
 
     use Magrathea::API;
     blah blah blah
 
-# DESCRIPTION
+## DESCRIPTION
 
 Stub documentation for Magrathea::API, created by h2xs. It looks like the
 author of the extension was negligent enough to leave the stub
@@ -19,9 +19,11 @@ Blah blah blah.
 
 Nothing Exported.
 
-# CLASS FUNCTIONS
+## MAIN API METHODS
 
-## new
+## Constructor
+
+### new
 
 This will create a new Magrathea object and open at telnet
 session to the server.  If authorisation fails, it will croak.
@@ -31,7 +33,7 @@ session to the server.  If authorisation fails, it will croak.
         password    => 'mypass',
     );
 
-### Parameters:
+#### Parameters:
 
 - username
 - password
@@ -50,7 +52,7 @@ session to the server.  If authorisation fails, it will croak.
 
     In seconds. Defaults to _10_.
 
-# INSTANCE FUNCTIONS
+## Allocation Methods 
 
 In all cases where `$number` is passed, this may be a string
 containing a number in National format (_020 1234 5678_) or
@@ -60,7 +62,7 @@ Also, [Phone::Number](https://metacpan.org/pod/Phone::Number) objects may be pas
 When a number is returned, it will always be in the for of a
 [Phone::Number](https://metacpan.org/pod/Phone::Number) object.
 
-## allocate
+### allocate
 
 Passed a prefix, this will allocate and activate a number.  You do not need
 to add the `_` characters.  If a number can be found, this routine
@@ -68,56 +70,99 @@ will return a [Phone::Number](https://metacpan.org/pod/Phone::Number) object.  I
 routine will return `undef`. It will croak on any other error from
 Magrathea.
 
-## allocate10
+### emergency\_info
 
-Passed a prefix, this will allocate and activate a block of 10 numbers.  You do
-not need to add the `_` characters.  If a block can be found, this routine
-should return an arrayref of ten [Phone::Number](https://metacpan.org/pod/Phone::Number) objects. Under odd
-circumstances, it is possible that fewer than ten numbers will be returned;
+### deactivate
 
-If no range is foud is found, this routine will return `undef`. It will croak
+Passed a number as a string or a [Phone::Number](https://metacpan.org/pod/Phone::Number), this deactivates
+the number.
+
+### reactivate
+
+Reactivates a number that has previously been deactivated.
+
+### list
+
+This should be passed a prefix and possibly a quantity (defaulting
+to 10.  It will return a sorted random list of available numbers matching
+the prefix.  These are returned as an array (or an arrayref) of
+[Phone::Number](https://metacpan.org/pod/Phone::Number).  None  of the numbers is allocated by this method.
+
+If none are available, the method will return an empty array.
+
+## Block Methods
+
+### block\_allocate
+
+This should be passed a prefix (without any `_` characters) and an
+optional block size (defaulting to 10).  It will attempt to allocate
+and activate a block of numbers.
+
+If a block can be found, this routine
+should return an array or arrayref of [Phone::Number](https://metacpan.org/pod/Phone::Number) objects. Under odd
+circumstances, it is possible that fewer than the requested quantity
+of numbers will be returned;
+
+If no range is found is found, this routine will return `undef` in scalar
+context or an empty array in list context. It will croak
 on any other error from Magrathea.
 
-## fax2email
+### block\_info
+
+This should be passed a number (string or [Phone::Number](https://metacpan.org/pod/Phone::Number))
+to check whether that number is part of a block.
+
+If it is, the size of the block will be returned in scalar context;
+In list context, the response will be an array of all the numbers
+in that block.
+
+If it is not a block, this will return `undef` or an empty
+array.
+
+### block\_deactivate
+
+This should be passed the first number in a block.  It will
+deactivate and return the block of numbers.
+
+### block\_reactivate
+
+This should be passed the first number in a block.  It will
+reactivate the block and return the size of the block in scalar
+context or an array of the numbers in list context.
+
+If the block is not available, this method will croak.
+
+In testing, this method has never worked correctly.
+
+## Service Methods
+
+### fax2email
 
 Sets a number as a fax to email.
 
     $mt->fax2email($number, $email_address);
 
-## voice2email
+### voice2email
 
 Sets a number as a voice to email.
 
     $mt->voice2email($number, $email_address);
 
-## sip
+### sip
 
     $mt->sip($number, $host, [$username, [$inband]]);
 
 Passed a number and a host, will set an inbound sip link
 to the international number (minus leading +) @ the host.
-I username is defined, it will be used instead of the number.
+If username is defined, it will be used instead of the number.
 If inband is true, it will force inband DTMF.  The default is
 RFC2833 DTMF.
 
-## iax2
-
-    $mt->iax2($number, $host, $username, $password);
-
-## divert
+### divert
 
     $mt->divert($number, $to_number);
 
-## deactivate
-
-Passed a number as a string or a Phone::Number, this deactivate
-the number.
-
-## reactivate
-
-Reactivates a number that has previously been deactivated.
-
-## status
+### status
 
 Returns the status for a given number.  
 
@@ -149,7 +194,7 @@ The [Magrathea::API::Status](https://metacpan.org/pod/Magrathea::API::Status) ob
 
 - `$status->type`
 
-    One of sip, iax2, fax2email, voice2email, divert or unallocated.
+    One of sip, fax2email, voice2email, divert or unallocated.
 
 - `$status->target`
 
@@ -162,7 +207,7 @@ The [Magrathea::API::Status](https://metacpan.org/pod/Magrathea::API::Status) ob
 In addition, it overloads '""' to provide as tring comprising
 the type and the target, separated by a space.
 
-# LOW LEVEL FUNCTIONS
+## Low Level Methods
 
 All the Magrathea low level calls are available.  These are
 simply passed an array of strings which are joined to create
@@ -226,17 +271,13 @@ The functions are:
 
         $mt->orde('02012345678 1 0000');
 
-- alten
-
-        $mt->alten('0845________');
-
 - info
 
         $mt->info('02012345678 GEN Magrathea, 14 Shute End, RG40 1BJ');
 
 It will not usually be necessary to call these functions directly.
 
-# SEE ALSO
+## SEE ALSO
 
 Mention other useful documentation such as the documentation of
 related modules or operating system documentation (such as man pages
@@ -247,11 +288,11 @@ If you have a mailing list set up for your module, mention it here.
 
 If you have a web site set up for your module, mention it here.
 
-# AUTHOR
+## AUTHOR
 
 Cliff Stanford, <cliff@may.be>
 
-# COPYRIGHT AND LICENSE
+## COPYRIGHT AND LICENCE
 
 Copyright (C) 2012 by Cliff Stanford
 

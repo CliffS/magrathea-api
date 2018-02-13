@@ -5,12 +5,12 @@ use warnings;
 use 5.10.0;
 
 use version 0.77; our $VERSION = qv('v0.9.0');
+use experimental qw{ switch };
 
 use Phone::Number;
+use Attribute::Boolean;
 
 use Carp;
-
-use enum qw{false true};
 
 use overload q("") => \&stringify;
 
@@ -70,9 +70,10 @@ sub new
     my $type = get_type $target;
     $target =~ s/.:(.*)/$1/;
     $target = new Phone::Number($target) if $type eq 'divert';
+    my $active:Boolean = $status eq 'Y';
     my $self = {
 	number	=> new Phone::Number($number),
-	active	=> $status eq 'Y',
+	active	=> $active,
 	expiry	=> $expiry,
 	type	=> $type,
 	target	=> $target,
