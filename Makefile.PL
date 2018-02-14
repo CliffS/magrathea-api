@@ -24,7 +24,11 @@ WriteMakefile(
 	'Phone::Number'	=> 0.01,
 	'Email::Address'=> 1.892,
 	'Data::Dumper'	=> 0,
+        'Attribute::Boolean' => v1.0.8,
     }, 
+    TEST_REQUIRES       => {
+        'Text::Autoformat' => 0,
+    },
     ABSTRACT_FROM  => 'lib/Magrathea/API.pm', # retrieve abstract from module
     AUTHOR         => 'Cliff Stanford <cliff@may.be>',
     MIN_PERL_VERSION => 5.10.0,
