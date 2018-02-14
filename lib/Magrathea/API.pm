@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-use version 0.77; our $VERSION = qv('v0.9.2');
+use version 0.77; our $VERSION = qv('v0.9.3');
 
 use Net::Telnet;
 use Phone::Number;
@@ -28,14 +28,21 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 =head2 VERSION
 
-Version 0.9.2
+Version 0.9.3
 
 Please note that this software is currently beta.
 
 =head2 SYNOPSIS
 
-  use Magrathea::API;
-  blah blah blah
+    use Magrathea::API;
+    my $mt = new Magrathea::API;
+    my $number = $mt->allocate('01792');
+    $mt->deactivate($number);
+    my @list = $mt->list('01792');
+    my @numbers = $mt->block_allocate('01792', 10);
+    $mt->fax2email($numbers[2], 'user@host.com');
+    $mt->divert($number[3], '+5716027171');
+    $emerg = $mt->emergency_info;
 
 =head2 DESCRIPTION
 

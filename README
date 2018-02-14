@@ -2,13 +2,20 @@
     Magrathea::API - Easier access to the Magrathea NTS API
 
   VERSION
-    Version 0.9.2
+    Version 0.9.3
 
     Please note that this software is currently beta.
 
   SYNOPSIS
-      use Magrathea::API;
-      blah blah blah
+        use Magrathea::API;
+        my $mt = new Magrathea::API;
+        my $number = $mt->allocate('01792');
+        $mt->deactivate($number);
+        my @list = $mt->list('01792');
+        my @numbers = $mt->block_allocate('01792', 10);
+        $mt->fax2email($numbers[2], 'user@host.com');
+        $mt->divert($number[3], '+5716027171');
+        $emerg = $mt->emergency_info;
 
   DESCRIPTION
     This module implements most of the Magrathea NTS API
