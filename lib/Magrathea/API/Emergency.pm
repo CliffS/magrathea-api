@@ -256,7 +256,7 @@ sub update
     unless ($self->postcode and $self->name) {
         croak "Name and postcode are mandatory";
     }
-    $response = $self->VALIDATE
+    my $response = $self->VALIDATE;
     croak "Update failed: $response" if  $response >= 2;
     return $response;
 }

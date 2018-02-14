@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-use version 0.77; our $VERSION = qv('v0.9.1');
+use version 0.77; our $VERSION = qv('v0.9.2');
 
 use Net::Telnet;
 use Phone::Number;
@@ -28,7 +28,7 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 =head2 VERSION
 
-Version 0.9.1
+Version 0.9.2
 
 Please note that this software is currently beta.
 
