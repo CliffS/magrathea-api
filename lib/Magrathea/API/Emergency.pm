@@ -4,18 +4,276 @@ use strict;
 use warnings;
 use 5.10.0;
 
+use Scalar::Util qw{ dualvar };
+use Attribute::Boolean;
 use Carp;
+use Data::Dumper;
+
+use Magrathea::API::Abbreviation qw{abbreviate};
+
+use constant DEBUG => true;
+
+use constant POSTCODE => qr/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$/;
+
+=head2 NAME
+
+Magrathea::API::Emergency - Access to the Magrathea 999 Interface
+
+=head2 EXAMPLE
+
+    use Magrathea::API;
+    my $mt = new Magrathea::API($username, $password);
+    my $emerg = $mt->emergency_info($phone_number);
+    # Get the status, print it and check it
+    my $status = $emerg->status;
+    say "Status is: $status" if $status != 0;
+    # Print the thoroughfare, update it and print it again
+    say "Thoroughfare is currently: ", $emerg->thoroughfare;
+    $emerg->thoroughfare("He is a justice of the peace and in accommodation.");
+    say "Thoroughfare is now ", $emerg->thoroughfare;
+    # prints: He is a J.P. & in Accom.
+    # Update the changes
+    $emerge->update
+
+=cut
+
+
+
+#################################################################
+##
+##  Local Prototyped Functions
+##
+#################################################################
+
+
+#################################################################
+##
+##  Private Instance Functions
+##
+#################################################################
+
+sub sendline
+{
+    my $self = shift;
+    my $message = shift // '';
+    say ">> $message" if DEBUG && $message;
+    $self->{telnet}->print($message) if $message;
+    my $response = $self->{telnet}->getline;
+    chomp $response;
+    my ($val, $msg) = $response =~ /^(\d)\s+(.*)/;
+    croak qq(Unknown response: "$response") unless defined $val;
+    say "<<$val $msg" if DEBUG;
+    return dualvar $val, $msg;
+}
+
+#################################################################
+##
+##  Class Functions
+##
+#################################################################
+
+=head2 METHODS
+
+=cut
 
 sub new
 {
     my $class = shift;
+    my $api = shift;
     my $number = shift;
-    my $api = caller;
-    croak "This package must not be called directly" unless $api eq 'Magrathea::API';
+    croak "This package must not be called directly" unless ref $api eq 'Magrathea::API';
     my $self = {
-        number => $number,
+        telnet  => $api->{telnet},
+        number  => $number,
     };
     bless $self, $class;
+    my %info;
+    my $response = $self->DATA($number->packed);
+    while (true) {
+        chomp $response;
+        my ($key, $value) = split / /, $response, 2;
+        $info{lc $key} = $value;
+    }
+    continue {
+        $response = $self->sendline;
+        last if $response > 0;
+    }
+    $self->{info} = \%info;
+    $self;
+}
+
+=head3 number
+
+This returns the number currently being worked on as a L<Phone::Number>.
+
+=cut
+
+sub number
+{
+    my $self = shift;
+    return $self->{number};
+}
+
+=head3 info
+
+This returns all the fields in a hash or as a pointer to a has
+depending on list or scalar context.  The fields are as documented for
+methods below.
+
+=cut
+
+sub info
+{
+    my $self = shift;
+    my %info = %{$self->{info}};  # Copy it so it can't be changed
+    return wantarray ? %info : \%info;
+}
+
+=head3 status
+
+This returns a single value for status.  The valuse returned can be
+used as a string and returns the message or as a number which returns
+the status code.  The possible statuses are curently as below but they
+are returned from Magrathea so the
+L<999 Appendix|https://www.magrathea-telecom.co.uk/assets/Client-Downloads/Magrathea-NTSAPI-999-Appendix.pdf>
+should be treated as authoritive.
+
+=over
+
+=item 0 Accepted
+
+=item 1 Info received
+
+=item 2 Info awaiting further validation
+
+=item 3 Info submitted
+
+=item 6 Submitted – Awaiting manual processing
+
+=item 8 Rejected
+
+=item 9 No record found
+
+=back
+
+=cut
+
+sub status
+{
+    my $self = shift;
+    my $status = eval {
+        $self->STATUS;
+    };
+    return $status;
+}
+
+
+=head3 title
+
+=head3 forename
+
+=head3 name
+
+=head3 honours
+
+=head3 bussuffix
+
+=head3 premises
+
+=head3 thoroughfare
+
+=head3 locality
+
+=head3 postcode
+
+The above methods will get or set a field in the 999 record.
+
+Abbreviations are substituted and they are then checked for
+maximum length.  These routines will croak if an invalid length
+(or invalid postcode) is passed
+
+To get the data, simply call the method, to change the data, pass
+it as a parameter.
+
+Nothing is sent to Magrathea until L</update> is called.
+
+=cut
+
+sub postcode
+{
+    my $self = shift;
+    my $postcode = shift;
+    if ($postcode) {
+        croak "Invalid postcode" unless $postcode =~ POSTCODE;
+        $self->{info}{postcode} = $postcode;
+    }
+    return $self->{info}{postcode};
+}
+
+=head3 update
+
+This will take the current data and send it to Magrathea.  The possible
+valid responses are C<Information Valid> (0 in numeric context) or
+C<Parsed OK. Check later for status.> (1 in numeric context).
+
+If Magrathea's validation fails, the update will croak.
+
+=cut
+
+sub update
+{
+    my $self = shift;
+    my $info = $self->info;
+    unless ($self->postcode and $self->name) {
+        croak "Name and postcode are mandatory";
+    }
+    $response = $self->VALIDATE
+    croak "Update failed: $response" if  $response >= 2;
+    return $response;
+}
+
+sub AUTOLOAD
+{
+    my $self = shift;
+    my $commands = qr{^(?:
+    CREATE|VALIDATE|STATUS|DATA|
+    TITLE|FORENAME|NAME|HONOURS|BUSSUFFIX|
+    PREMISES|THOOROUGHFARE|LOCALITY|POSTCODE
+    )$}x;
+    my %fields = (
+        title => 20,
+        forename => 20,
+        name => 50,
+        honours => 30,
+        bussuffix => 50,
+        premises => 60,
+        thoroughfare => 55, 
+        locality => 30
+    );
+    (my $name = our $AUTOLOAD) =~ s/.*://;
+    if ($name =~ /^[A-Z]+$/) {
+        croak "Unknown Command: $name" unless $name =~ $commands;
+        my @cmd = ('INFO', $self->number->packed, 999, $name, @_);
+        return $self->sendline("@cmd");
+    }
+    else {
+        my $value = shift;
+        croak "Unknown method: $name" unless exists $fields{$name};
+        if ($value) {
+            my $abbr = abbreviate $value;
+            my $len = length $abbr;
+            my $max = $fields{$name};
+            croak "$abbr ($len charancters abbreviated)\n" .
+            "is longer than the max. length of $max" .
+            "for field $name" if $len > $max;
+            $self->{info}{$name} = $abbr;
+        }
+        return $self->{info}{$name};
+    }
+}
+
+sub DESTROY {
+    # Avoid AUTOLOAD
 }
 
 1;

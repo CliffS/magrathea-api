@@ -70,7 +70,7 @@ sub sendline
 {
     my $self = shift;
     my $message = shift // '';
-    say ">> $message" if DEBUG;
+    say ">> $message" if DEBUG && $message;
     $self->{telnet}->print($message) if $message;
     my $response = $self->{telnet}->getline;
     chomp $response;
@@ -78,7 +78,7 @@ sub sendline
     croak qq(Unknown response: "$response") unless defined $val;
     say "<<$val $msg" if DEBUG;
     croak "$msg" unless $val == 0;
-    return $msg;
+    return $val, $msg;
 }
 
 #################################################################
@@ -206,17 +206,6 @@ sub allocate
 	}
     }
     return undef;   # Failed after 5 attempts.
-}
-
-=head3 emergency_info
-
-=cut
-
-sub emergency_info
-{
-    my $self = shift;
-    my $number = new Phone::Number(shift);
-    return new Magrathea::API::Emergency($number);
 }
 
 =head3 deactivate
@@ -532,6 +521,23 @@ sub status
 	push @retval, $stat;
     }
     return @retval;
+}
+
+=head2 Emergency Methods
+
+=head3 emergency_info
+
+Passed a phone number, this method returns a
+L<Magrathea::API::Emergency> object with the current 999
+information.
+
+=cut
+
+sub emergency_info
+{
+    my $self = shift;
+    my $number = new Phone::Number(shift);
+    return new Magrathea::API::Emergency($self, $number);
 }
 
 =head2 Low Level Methods
