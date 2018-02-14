@@ -3,6 +3,7 @@ package Magrathea::API::Emergency;
 use strict;
 use warnings;
 use 5.10.0;
+use utf8;
 
 use Scalar::Util qw{ dualvar };
 use Attribute::Boolean;
@@ -14,6 +15,8 @@ use Magrathea::API::Abbreviation qw{abbreviate};
 use constant DEBUG => true;
 
 use constant POSTCODE => qr/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$/;
+
+=encoding utf8
 
 =head2 NAME
 

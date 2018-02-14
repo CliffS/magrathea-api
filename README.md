@@ -70,8 +70,6 @@ will return a [Phone::Number](https://metacpan.org/pod/Phone::Number) object.  I
 routine will return `undef`. It will croak on any other error from
 Magrathea.
 
-### emergency\_info
-
 ### deactivate
 
 Passed a number as a string or a [Phone::Number](https://metacpan.org/pod/Phone::Number), this deactivates
@@ -206,6 +204,14 @@ The [Magrathea::API::Status](https://metacpan.org/pod/Magrathea::API::Status) ob
 
 In addition, it overloads '""' to provide as tring comprising
 the type and the target, separated by a space.
+
+## Emergency Methods
+
+### emergency\_info
+
+Passed a phone number, this method returns a
+[Magrathea::API::Emergency](https://metacpan.org/pod/Magrathea::API::Emergency) object with the current 999
+information.
 
 ## Low Level Methods
 

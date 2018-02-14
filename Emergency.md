@@ -83,11 +83,3 @@ valid responses are `Information Valid` (0 in numeric context) or
 `Parsed OK. Check later for status.` (1 in numeric context).
 
 If Magrathea's validation fails, the update will croak.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 151:
-
-    Non-ASCII character seen before =encoding in '–'. Assuming UTF-8

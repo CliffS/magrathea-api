@@ -21,6 +21,8 @@ our @CARP_NOT = qw{ Net::Telnet };
 
 use constant DEBUG => true;
 
+=encoding utf8
+
 =head2 NAME
 
 Magrathea::API - Easier access to the Magrathea NTSAPI
