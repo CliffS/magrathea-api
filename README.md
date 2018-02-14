@@ -1,6 +1,6 @@
 ## NAME
 
-Magrathea::API - Easier access to the Magrathea NTSAPI
+Magrathea::API - Easier access to the Magrathea NTS API
 
 ## SYNOPSIS
 
@@ -9,11 +9,9 @@ Magrathea::API - Easier access to the Magrathea NTSAPI
 
 ## DESCRIPTION
 
-Stub documentation for Magrathea::API, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
+This module implements most of the
+[Magrathea NTS API](https://www.magrathea-telecom.co.uk/assets/Client-Downloads/Numbering-API-Instructions.pdf)
+in a simple format.
 
 ## EXPORT
 
@@ -283,24 +281,18 @@ The functions are:
 
 It will not usually be necessary to call these functions directly.
 
-## SEE ALSO
-
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
-
 ## AUTHOR
 
 Cliff Stanford, <cliff@may.be>
 
+## ISSUES
+
+Please open any issues with this code on the
+[Github Issues Page](https://github.com/CliffS/magrathea-api/issues).
+
 ## COPYRIGHT AND LICENCE
 
-Copyright (C) 2012 by Cliff Stanford
+Copyright (C) 2012 - 2018 by Cliff Stanford
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

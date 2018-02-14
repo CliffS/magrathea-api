@@ -1,9 +1,11 @@
 Changes
+Emergency.md
+lib/Magrathea/API.pm
+lib/Magrathea/API/Abbreviation.pm
+lib/Magrathea/API/Emergency.pm
+lib/Magrathea/API/Status.pm
 Makefile.PL
 MANIFEST
 README
+README.md
 t/Magrathea-API.t
-lib/Magrathea/API.pm
-lib/Magrathea/API/Status.pm
-lib/Magrathea/API/Abbreviation.pm
-lib/Magrathea/API/Emergency.pm
