@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-use version 0.77; our $VERSION = qv('1.0.0');
+use version 0.77; our $VERSION = qv('0.9.0');
 
 use Net::Telnet;
 use Phone::Number;
@@ -15,7 +15,6 @@ use Attribute::Boolean;
 
 use Carp;
 use Data::Dumper;
-#use Try::Tiny;
 
 our @CARP_NOT = qw{ Net::Telnet };
 
@@ -26,6 +25,12 @@ use constant DEBUG => true;
 =head2 NAME
 
 Magrathea::API - Easier access to the Magrathea NTS API
+
+=head2 VERSION
+
+Version 0.9.0
+
+Please note that this software is currently beta.
 
 =head2 SYNOPSIS
 
