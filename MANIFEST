@@ -5,3 +5,5 @@ README
 t/Magrathea-API.t
 lib/Magrathea/API.pm
 lib/Magrathea/API/Status.pm
+lib/Magrathea/API/Abbreviation.pm
+lib/Magrathea/API/Emergency.pm
