@@ -40,7 +40,18 @@ Magrathea::API::Emergency - Access to the Magrathea 999 Interface
 
 =cut
 
+=head2 DESCRIPTION
 
+This module represents the
+L<Magrathea 999 API Appendix|https://www.magrathea-telecom.co.uk/assets/Client-Downloads/Magrathea-NTSAPI-999-Appendix.pdf>.
+
+It should not be constructed by user code; it is only avalible through
+the main L<Magrathea::API> code as follows:
+
+    my $mt = new Magrathea::API($username, $password);
+    my $emerg = $mt->emergency_info($phone_number);
+
+=cut
 
 #################################################################
 ##
@@ -103,6 +114,21 @@ sub new
     }
     $self->{info} = \%info;
     $self;
+}
+
+=head2 create
+
+This is used the first time a number is put onto the database and
+then only if the owner changes.  It needs to be followed by an
+L</update> after entering all the data.
+
+=cut
+
+sub create
+{
+    my $self = shift;
+    my $result = $self->CREATE;
+    croak "$result" unless $result == 0;
 }
 
 =head3 number
@@ -278,5 +304,24 @@ sub AUTOLOAD
 sub DESTROY {
     # Avoid AUTOLOAD
 }
+
+=head2 AUTHOR
+
+Cliff Stanford, E<lt>cliff@may.beE<gt>
+
+=head2 ISSUES
+
+Please open any issues with this code on the
+L<Github Issues Page|https://github.com/CliffS/magrathea-api/issues>.
+
+=head2 COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 - 2018 by Cliff Stanford
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
 
 1;

@@ -18,7 +18,24 @@ Magrathea::API::Emergency - Access to the Magrathea 999 Interface
     # Update the changes
     $emerge->update
 
+## DESCRIPTION
+
+This module represents the
+[Magrathea 999 API Appendix](https://www.magrathea-telecom.co.uk/assets/Client-Downloads/Magrathea-NTSAPI-999-Appendix.pdf).
+
+It should not be constructed by user code; it is only avalible through
+the main [Magrathea::API](https://metacpan.org/pod/Magrathea::API) code as follows:
+
+    my $mt = new Magrathea::API($username, $password);
+    my $emerg = $mt->emergency_info($phone_number);
+
 ## METHODS
+
+## create
+
+This is used the first time a number is put onto the database and
+then only if the owner changes.  It needs to be followed by an
+["update"](#update) after entering all the data.
 
 ### number
 
@@ -83,3 +100,20 @@ valid responses are `Information Valid` (0 in numeric context) or
 `Parsed OK. Check later for status.` (1 in numeric context).
 
 If Magrathea's validation fails, the update will croak.
+
+## AUTHOR
+
+Cliff Stanford, <cliff@may.be>
+
+## ISSUES
+
+Please open any issues with this code on the
+[Github Issues Page](https://github.com/CliffS/magrathea-api/issues).
+
+## COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 - 2018 by Cliff Stanford
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
