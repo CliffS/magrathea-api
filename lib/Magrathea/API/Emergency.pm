@@ -239,6 +239,28 @@ sub postcode
     return $self->{info}{postcode};
 }
 
+=head3 ported
+
+This is a boolean value showing whether or not the number has been
+ported in from another provider.  It will always evaluate to C<false>
+though unless set by this mthod as there is no way to store the
+information on the Magrathea database.
+
+
+        $emerge->ported(true);
+        my $ported = $emerg->ported;
+
+=cut
+
+sub ported
+{
+    my $self = shift;
+    my $value : Boolean = shift;
+    my $self->{ported} = $value if defined $value;
+    $value = $self->{ported};
+    return $value;
+}
+
 =head3 update
 
 This will take the current data and send it to Magrathea.  The possible
@@ -282,7 +304,9 @@ sub AUTOLOAD
     (my $name = our $AUTOLOAD) =~ s/.*://;
     if ($name =~ /^[A-Z]+$/) {
         croak "Unknown Command: $name" unless $name =~ $commands;
-        my @cmd = ('INFO', $self->number->packed, 999, $name, @_);
+        my $number = $self->number->packed;
+        $number =~ s/^0/P/ if $self->ported;
+        my @cmd = ('INFO', $number, 999, $name, @_);
         return $self->sendline("@cmd");
     }
     else {
