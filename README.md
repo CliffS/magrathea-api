@@ -4,7 +4,7 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 ## VERSION
 
-Version 1.0.0
+Version 1.1.0
 
 Please note that this software is currently beta.
 
@@ -62,6 +62,12 @@ session to the server.  If authorisation fails, it will croak.
 - timeout
 
     In seconds. Defaults to _10_.
+
+- debug
+
+    If set to a true value, this will output the conversation between the API
+    and Magrathea's server.  Be careful as this will also echo the username
+    and password.
 
 ## Allocation Methods 
 
