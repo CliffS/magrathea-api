@@ -12,7 +12,7 @@ use Data::Dumper;
 
 use Magrathea::API::Abbreviation qw{abbreviate};
 
-use constant POSTCODE => qr/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$/;
+use constant POSTCODE_RE => qr/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$/;
 
 =encoding utf8
 
@@ -231,7 +231,7 @@ sub postcode
     my $postcode = shift;
     if ($postcode) {
         if ($postcode ne "") {
-            croak "Invalid postcode" unless $postcode =~ POSTCODE;
+            croak "Invalid postcode" unless $postcode =~ POSTCODE_RE;
         }
         $self->{info}{postcode} = $postcode;
         $self->POSTCODE($postcode);
