@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-use version 0.77; our $VERSION = qv('v1.1.2');
+use version 0.77; our $VERSION = qv('v1.1.3');
 
 use Net::Telnet;
 use Phone::Number;
@@ -26,7 +26,7 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 =head2 VERSION
 
-Version 1.1.2
+Version 1.1.3
 
 Please note that this software is currently beta.
 
@@ -80,13 +80,13 @@ sub sendline
 {
     my $self = shift;
     my $message = shift // '';
-    say ">> $message" if $self->{debug} && $message;
+    say ">> $message" if $self->{params}{debug} && $message;
     $self->{telnet}->print($message) if $message;
     my $response = $self->{telnet}->getline;
     chomp $response;
     my ($val, $msg) = $response =~ /^(\d)\s+(.*)/;
     croak qq(Unknown response: "$response") unless defined $val;
-    say "<<$val $msg" if $self->{debug};
+    say "<<$val $msg" if $self->{params}{debug};
     croak "$msg" unless $val == 0;
     return $val, $msg;
 }
@@ -278,7 +278,7 @@ sub list
             my $response = $self->{telnet}->getline;
             chomp $response;
             my ($val, $msg) = $response =~ /^(\d)\s+(.*)/;
-            say "<<$val $msg" if $self->{debug};
+            say "<<$val $msg" if $self->{params}{debug};
             last if $val != 0;
             push @results, new Phone::Number($msg);
         }
