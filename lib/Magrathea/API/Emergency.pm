@@ -103,14 +103,11 @@ sub new
     bless $self, $class;
     my %info;
     my $response = $self->DATA($number->packed);
-    while (true) {
+    while ($response == 0) {
         chomp $response;
         my ($key, $value) = split / /, $response, 2;
         $info{lc $key} = $value;
-    }
-    continue {
         $response = $self->sendline;
-        last if $response > 0;
     }
     $self->{info} = \%info;
     $self;
