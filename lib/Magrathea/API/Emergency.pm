@@ -230,7 +230,9 @@ sub postcode
     my $self = shift;
     my $postcode = shift;
     if ($postcode) {
-        croak "Invalid postcode" unless $postcode =~ POSTCODE;
+        if ($postcode ne "") {
+            croak "Invalid postcode" unless $postcode =~ POSTCODE;
+        }
         $self->{info}{postcode} = $postcode;
         $self->POSTCODE($postcode);
     }
@@ -287,7 +289,7 @@ sub AUTOLOAD
     my $commands = qr{^(?:
     CREATE|VALIDATE|STATUS|DATA|
     TITLE|FORENAME|NAME|HONOURS|BUSSUFFIX|
-    PREMISES|THOOROUGHFARE|LOCALITY|POSTCODE
+    PREMISES|THOROUGHFARE|LOCALITY|POSTCODE
     )$}x;
     my %fields = (
         title => 20,
@@ -310,7 +312,7 @@ sub AUTOLOAD
     else {
         my $value = shift;
         croak "Unknown method: $name" unless exists $fields{$name};
-        if ($value) {
+        if (defined $value) {
             my $abbr = abbreviate $value;
             my $len = length $abbr;
             my $max = $fields{$name};
