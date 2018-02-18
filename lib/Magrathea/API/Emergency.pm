@@ -12,8 +12,6 @@ use Data::Dumper;
 
 use Magrathea::API::Abbreviation qw{abbreviate};
 
-use constant DEBUG => true;
-
 use constant POSTCODE => qr/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$/;
 
 =encoding utf8
@@ -70,13 +68,13 @@ sub sendline
 {
     my $self = shift;
     my $message = shift // '';
-    say ">> $message" if DEBUG && $message;
+    say ">> $message" if $self->{debug} && $message;
     $self->{telnet}->print($message) if $message;
     my $response = $self->{telnet}->getline;
     chomp $response;
     my ($val, $msg) = $response =~ /^(\d)\s+(.*)/;
     croak qq(Unknown response: "$response") unless defined $val;
-    say "<<$val $msg" if DEBUG;
+    say "<<$val $msg" if $self->{debug};
     return dualvar $val, $msg;
 }
 
@@ -95,9 +93,11 @@ sub new
     my $class = shift;
     my $api = shift;
     my $number = shift;
+    local $_;
     croak "This package must not be called directly" unless ref $api eq 'Magrathea::API';
     my $self = {
         telnet  => $api->{telnet},
+        debug   => $api->{debug},
         number  => $number,
     };
     bless $self, $class;

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-use version 0.77; our $VERSION = qv('v1.0.1');
+use version 0.77; our $VERSION = qv('v1.1.0');
 
 use Net::Telnet;
 use Phone::Number;
@@ -18,8 +18,6 @@ use Data::Dumper;
 
 our @CARP_NOT = qw{ Net::Telnet };
 
-use constant DEBUG => true;
-
 =encoding utf8
 
 =head2 NAME
@@ -28,7 +26,7 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 =head2 VERSION
 
-Version 1.0.1
+Version 1.1.0
 
 Please note that this software is currently beta.
 
@@ -82,13 +80,13 @@ sub sendline
 {
     my $self = shift;
     my $message = shift // '';
-    say ">> $message" if DEBUG && $message;
+    say ">> $message" if $self->{debug} && $message;
     $self->{telnet}->print($message) if $message;
     my $response = $self->{telnet}->getline;
     chomp $response;
     my ($val, $msg) = $response =~ /^(\d)\s+(.*)/;
     croak qq(Unknown response: "$response") unless defined $val;
-    say "<<$val $msg" if DEBUG;
+    say "<<$val $msg" if $self->{debug};
     croak "$msg" unless $val == 0;
     return $val, $msg;
 }
@@ -135,6 +133,12 @@ Defaults to I<777>.
 
 In seconds. Defaults to I<10>.
 
+=item debug
+
+If set to a true value, this will output the conversation between the API
+and Magrathea's server.  Be careful as this will also echo the username
+and password.
+
 =back
 
 =cut
@@ -146,6 +150,7 @@ sub new
 	host	=> 'api.magrathea-telecom.co.uk',
 	port	=> 777,
 	timeout	=> 10,
+        debug   => false,
     );
     my %params = (%defaults, @_);
     croak "Username & Password Required"
@@ -263,6 +268,7 @@ sub list
     my $self = shift;
     my $prefix = shift;
     my $qty = shift // 10;
+    local $_;
     my @results;
     eval {
         push @results, new Phone::Number($self->alist($prefix, $qty));
@@ -272,7 +278,7 @@ sub list
             my $response = $self->{telnet}->getline;
             chomp $response;
             my ($val, $msg) = $response =~ /^(\d)\s+(.*)/;
-            say "<<$val $msg" if DEBUG;
+            say "<<$val $msg" if $self->{debug};
             last if $val != 0;
             push @results, new Phone::Number($msg);
         }
@@ -306,6 +312,7 @@ sub block_allocate
     my $self = shift;
     my $range = shift;
     my $qty = shift // 10;
+    local $_;
     croak "Block size must be a number" unless $qty =~ /^\d+$/;
     my $alloc = eval {
 	$self->blkacti($range, $qty);

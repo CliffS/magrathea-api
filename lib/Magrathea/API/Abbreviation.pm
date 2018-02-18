@@ -13,6 +13,7 @@ our @EXPORT_OK = qw{ abbreviate };
 sub abbreviate($)
 {
     my $check = shift;
+    local $_;
     my $wanted = autoformat $check, {
         case => 'highlight'
     };
