@@ -232,6 +232,7 @@ sub postcode
     if ($postcode) {
         croak "Invalid postcode" unless $postcode =~ POSTCODE;
         $self->{info}{postcode} = $postcode;
+        $self->POSTCODE($postcode);
     }
     return $self->{info}{postcode};
 }
@@ -317,6 +318,8 @@ sub AUTOLOAD
             "is longer than the max. length of $max" .
             "for field $name" if $len > $max;
             $self->{info}{$name} = $abbr;
+            my $cmd = uc $name;
+            $self->$cmd($abbr);
         }
         return $self->{info}{$name};
     }
