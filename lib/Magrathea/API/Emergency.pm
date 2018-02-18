@@ -97,7 +97,7 @@ sub new
     croak "This package must not be called directly" unless ref $api eq 'Magrathea::API';
     my $self = {
         telnet  => $api->{telnet},
-        debug   => $api->{debug},
+        debug   => $api->{params}{debug},
         number  => $number,
     };
     bless $self, $class;
