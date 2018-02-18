@@ -97,10 +97,10 @@ Nothing is sent to Magrathea until ["update"](#update) is called.
 
 This is a boolean value showing whether or not the number has been
 ported in from another provider.  It will always evaluate to `false`
-though unless set by this mthod as there is no way to store the
+though unless set by this method as there is no way to store the
 information on the Magrathea database.
 
-        $emerge->ported(true);
+        $emerge->ported(true);      # Assuming true is set to 1
         my $ported = $emerg->ported;
 
 ### update

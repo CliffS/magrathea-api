@@ -4,7 +4,7 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 ## VERSION
 
-Version 1.1.0
+Version 1.1.1
 
 Please note that this software is currently beta.
 
