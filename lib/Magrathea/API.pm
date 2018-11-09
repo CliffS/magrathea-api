@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-use version 0.77; our $VERSION = qv('v1.5.0');
+use version 0.77; our $VERSION = qv('v1.5.1');
 
 use Net::Telnet;
 use Phone::Number;
@@ -26,7 +26,7 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 =head2 VERSION
 
-Version 1.5.0
+Version 1.5.1
 
 =head2 SYNOPSIS
 
@@ -557,7 +557,8 @@ sub emergency_info
 {
     my $self = shift;
     my $number = new Phone::Number(shift);
-    return new Magrathea::API::Emergency($self, $number);
+    my $ported = shift;
+    return new Magrathea::API::Emergency($self, $number, $ported);
 }
 
 =head2 Low Level Methods
