@@ -276,7 +276,7 @@ sub ported
 {
     my $self = shift;
     my $val = shift;
-    my $value : Boolean = $value;
+    my $value : Boolean = $val;
     $self->{ported} = $value if defined $val;
     $value = $self->{ported};
     return $value;
